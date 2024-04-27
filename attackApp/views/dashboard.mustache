@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Operations Center Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script> <!-- ECharts Library -->
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-gap: 20px;
+    padding: 20px;
+}
+
+.sidebar {
+    background-color: #34495e;
+    color: #ecf0f1;
+    padding: 20px;
+}
+
+.main-content {
+    background-color: #ecf0f1;
+    padding: 20px;
+}
+
+.card {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.card th,
+.card td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.card th {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+
+.card td:last-child {
+    text-align: center;
+}
+
+.status-thwarted {
+    color: green;
+}
+
+.status-successful {
+    color: red;
+}
+
+.status-investigation {
+    color: orange;
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 10px;
+    border-bottom: 1px solid #455a64;
+}
+
+.sidebar ul li:last-child {
+    border-bottom: none;
+}
+
+.sidebar ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+}
+
+/* New Styles for Attack Log */
+.attack-log {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.attack-log th,
+.attack-log td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.attack-log th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.history-log,
+.zero-day-log {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.history-log::-webkit-scrollbar,
+.zero-day-log::-webkit-scrollbar {
+    width: 5px;
+}
+
+.history-log::-webkit-scrollbar-thumb,
+.zero-day-log::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.card tbody .severity-critical {
+    background-color: #ffcccc; /* Light red for critical severity */
+}
+
+.card tbody .severity-high {
+    background-color: #ffffcc; /* Light yellow for high severity */
+}
+
+.card tbody .severity-normal {
+    background-color: #ccffcc; /* Light green for normal severity */
+}
+.flex-container {
+  display: flex;
+  background-color: #ecf0f1;
+}
+.flex-container > div {
+  background-color: #f1f1f1;
+ 
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Welcome to INFO7390 Security Operations Center</h1>
+        <p>Officers on duty: Emmanuel and Felix</p>
+    </div>
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/attack">Generate Attack</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="card" >
+                <h3>Attack Simulation Summary</h3>
+                <div class="flex-container">
+                    <div id="main-chart" id="attacksummary" style="width: 100%; height: 200px;" ></div>
+                    <div id="severity-chart" style="width: 100%; height: 200px;" ></div>
+                </div>
+            </div>
+        
+            <div class="card">
+                <h3>Attack Simulation Results</h3>
+                <table class="attack-table">
+                    <thead>
+                        <tr>
+                            <th>Target IP</th>
+                            <th>Date & Time</th>
+                            <th>Severity</th>
+                            <th>Attack Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attack-results">
+                        <!-- Attack simulation results will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        const fetchAttackResultsSummary = async () => {
+            try {
+                const response = await fetch('/getlogs');
+                const results = await response.json();
+                processAndDisplayData(results);
+            } catch (error) {
+                console.error('Error fetching attack results:', error);
+            }
+        };
+
+        const processAndDisplayData = (data) => {
+            const classificationCounts = {};
+            data.forEach(item => {
+                classificationCounts[item.classification] = (classificationCounts[item.classification] || 0) + 1;
+            });
+
+            // Prepare data array with color customization
+            const chartData = Object.entries(classificationCounts).map(([key, value]) => {
+                return {
+                    name: key,
+                    value: value,
+                    itemStyle: {
+                        color: key.toLowerCase() === "benign" ? '#00ff00' : key.toLowerCase() === "attack" ? '#ff0000' : '#ccc'
+                    }
+                };
+            });
+
+            // ECharts visualization
+            const myChart = echarts.init(document.getElementById('main-chart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis: {
+                    type: 'category',
+                    data: chartData.map(item => item.name)
+                },
+                series: [
+                    {
+                        name: 'Classification Count',
+                        type: 'bar',
+                        data: chartData
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        };
+
+        fetchAttackResultsSummary();
+    </script>
+
+<script>
+        const fetchAttackResultsSeverity = async () => {
+            try {
+                const response = await fetch('/getlogs');
+                const results = await response.json();
+                processAndDisplaySeverity(results);
+            } catch (error) {
+                console.error('Error fetching attack results:', error);
+            }
+        };
+
+        const processAndDisplaySeverity = (data) => {
+            const severityCounts = {};
+            data.forEach(item => {
+                severityCounts[item.severity] = (severityCounts[item.severity] || 0) + 1;
+            });
+
+            const chartData = Object.entries(severityCounts).map(([key, value]) => ({
+                name: key,
+                value: value,
+                itemStyle: {
+                    color: key === 'critical' ? '#f30505ea' : key === 'high' ? '#ffcc00' : '#00ff00'
+                }
+            }));
+
+            const severityChart = echarts.init(document.getElementById('severity-chart'));
+            const severityOption = {
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                xAxis: { type: 'value', boundaryGap: [0, 0.01] },
+                yAxis: { type: 'category', data: chartData.map(item => item.name) },
+                series: [
+                    { name: 'Severity Count', type: 'bar', data: chartData }
+                ]
+            };
+            severityChart.setOption(severityOption);
+        };
+
+        fetchAttackResultsSeverity();
+    </script>
+    
+    <script>
+       const fetchAttackResults = async () => {
+    try {
+        const response = await fetch('/getlogs');
+        const results = await response.json();
+
+        const tableBody = document.getElementById('attack-results');
+        results.forEach(result => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${result.targetIP}</td>
+                <td>${new Date(result.dateTime).toLocaleString()}</td>
+                <td>${result.severity}</td>
+                <td>${mapClassToAttackType(result.class)}</td>
+            `;
+
+            // Set the background color of the row based on the severity
+            switch (result.severity) {
+                case 'critical':
+                    row.style.backgroundColor = '#ffcccc'; // Light red
+                    break;
+                case 'high':
+                    row.style.backgroundColor = '#ffffcc'; // Light yellow
+                    break;
+                case 'normal':
+                    row.style.backgroundColor = '#ccffcc'; // Light green
+                    break;
+            }
+
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error fetching attack results:', error);
+    }
+};
+
+const mapClassToAttackType = (attackClass) => {
+    switch (attackClass) {
+        case 0:
+            return 'Bot';
+        case 1:
+            return 'DDoS';
+        case 2:
+            return 'DoS GoldenEye';
+        case 3:
+            return 'DoS Hulk';
+        case 4:
+            return 'DoS Slowhttptest';
+        case 5:
+            return 'DoS slowloris';
+        case 6:
+            return 'FTP-Patator';
+        case 7:
+            return 'PortScan';
+        case 8:
+            return 'SSH-Patator';
+        case 9:
+            return 'ZeroDay';
+        case 10:
+            return 'Web Attack Brute Force';
+        case 11:
+            return 'Web Attack Sql Injection';
+        case 12:
+            return 'Web Attack XSS';
+        case 13:
+            return 'Zero-day'
+        default:
+            return 'Normal Traffic';
+    }
+};
+
+fetchAttackResults();
+
+
+    </script>
+</body>
+</html>
