@@ -1,15 +1,15 @@
-# Tri-Layer Intrusion Detection System (TLIDS)
+# Tri-Layer Intrusion Detection System (TriLIDS)
 
 ## Overview
-The Tri-Layer Intrusion Detection System (TLIDS) is an advanced anomaly detection solution developed 
+The Tri-Layer Intrusion Detection System (TriLIDS) is an advanced anomaly detection solution developed 
 
-## TLIDS Demonstration
-Here is video demo of the Tri-Layer Intrusion Detection System:
+## TriLIDS Demonstration
+Here is video demo of the TriLIDS:
 
 https://github.com/user-attachments/assets/6cc79274-84f2-4c28-97ed-8e7bd42b87cf
 
 ## Project Objective
-The primary aims of the TLIDS project are:
+The primary aims of the TriLIDS project are:
 1. Model Development: To develop a hierarchical machine learning model that performs both binary and multiclass detection for known and zero-day attacks.
 2. Model Deployment: To deploy the model as a service that can be used by external systems, encapsulated within Docker.
 3. Interface Creation: To develop a web interface for simulating attack requests to the deployed model and a dashboard for visualizing predictions.
@@ -18,7 +18,7 @@ The primary aims of the TLIDS project are:
 This project uses the Canadian Institute for Cybersecurity (CIC) Intrusion Detection Evaluation Dataset (CIC-IDS2017), which contains benign and the most up-to-date common attacks. The dataset is utilized for training the model to recognize various types of network anomalies.
 
 ## Model Architecture
-The TLIDS architecture is composed of three main stages:
+The TriLIDS architecture is composed of three main stages:
 1. Anomaly Detection: Initial filtering of network traffic to identify potential threats using a hybrid CNN-LSTM model.
 2. Attack Classification: Classification of the detected anomalies into specific known attack categories using a Random Forest Classifier.
 3. Refinement Stage: Further analysis to reduce false positives and identify zero-day attacks using anomaly scoring.
