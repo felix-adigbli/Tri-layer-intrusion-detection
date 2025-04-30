@@ -39,3 +39,7 @@ The system is containerized using Docker, with Flask serving the RESTful API tha
 2. Access the Web Interface: Navigate to the web interface to simulate attack scenarios and view the dashboard for results.
 3. API Interaction: You can also interact directly with the API through the `/predict` endpoint for integrating with other systems.
 
+
+
+https://github.com/user-attachments/assets/6cc79274-84f2-4c28-97ed-8e7bd42b87cf
+
