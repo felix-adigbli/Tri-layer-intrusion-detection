@@ -3,6 +3,11 @@
 ## Overview
 The Tri-Layer Intrusion Detection System (TLIDS) is an advanced anomaly detection solution developed 
 
+## TLIDS Demonstration
+Here is video demo of the Tri-Layer Intrusion Detection System:
+
+https://github.com/user-attachments/assets/6cc79274-84f2-4c28-97ed-8e7bd42b87cf
+
 ## Project Objective
 The primary aims of the TLIDS project are:
 1. Model Development: To develop a hierarchical machine learning model that performs both binary and multiclass detection for known and zero-day attacks.
@@ -39,7 +44,5 @@ The system is containerized using Docker, with Flask serving the RESTful API tha
 2. Access the Web Interface: Navigate to the web interface to simulate attack scenarios and view the dashboard for results.
 3. API Interaction: You can also interact directly with the API through the `/predict` endpoint for integrating with other systems.
 
-## Demo of the Tri-Layer Intrusion Detection System (TLIDS)
 
-https://github.com/user-attachments/assets/6cc79274-84f2-4c28-97ed-8e7bd42b87cf
 
